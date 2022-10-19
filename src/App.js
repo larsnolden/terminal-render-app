@@ -14,7 +14,7 @@ function App() {
   }, 2000);
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen text-stone-700">
       {currentView === "recognize" && <Recognize />}
       {currentView === "schedule" && (
         <Schedule personName={demoData.name} schedule={demoData.schedule} />
