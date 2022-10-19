@@ -1,23 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
+
+import Recognize from "./views/Recognize";
+import Schedule from "./views/Schedule";
+
+import demoData from "./DemoData";
 
 function App() {
+  const [currentView, setCurrentView] = useState("schedule");
+
+  setTimeout(() => {
+    // setCurrentView("schedule");
+  }, 2000);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg-slate-50 min-h-screen">
+      {currentView === "recognize" && <Recognize />}
+      {currentView === "schedule" && (
+        <Schedule personName={demoData.name} schedule={demoData.schedule} />
+      )}
     </div>
   );
 }
