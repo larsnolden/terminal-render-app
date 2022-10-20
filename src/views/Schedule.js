@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import styled from "styled-components";
 
 import Card from "../components/Card";
+import Pill from "../components/Pill";
 
 const HeightContainer = styled.div`
   height: ${(props) => props.height}px;
@@ -11,7 +12,7 @@ const HeightContainer = styled.div`
 `;
 
 const ScheduleColumn = ({ time }) => (
-  <div className="flex flex-row border-b-2 mb-2 pb-1 border-slate-300 font-light text-lg">
+  <div className="flex flex-row border-b mb-2 pb-1 border-slate-300 font-light text-lg">
     {time}
   </div>
 );
@@ -22,7 +23,13 @@ const calendarHours = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((hour) =>
   dayjs().hour(hour).minute(0).second(0)
 );
 
-const EventItem = ({ from, to, eventName, verticalPixelPerMinute }) => {
+const EventItem = ({
+  from,
+  to,
+  eventName,
+  location,
+  verticalPixelPerMinute,
+}) => {
   const height =
     dayjs(to).diff(dayjs(from), "minutes") * verticalPixelPerMinute;
   const offset =
@@ -34,9 +41,10 @@ const EventItem = ({ from, to, eventName, verticalPixelPerMinute }) => {
     <HeightContainer
       bottomOffset={offset}
       height={height}
-      className="absolute drop-shadow-md font-semibold text-emerald-900 rounded-lg p-4 bg-green-400"
+      className="absolute drop-shadow-md font-semibold text-emerald-900 rounded-lg p-4 bg-green-400 flex flex-row justify-between"
     >
-      {eventName}
+      <div className="relative w-8/12">{eventName}</div>
+      <Pill color="blue">{location}</Pill>
     </HeightContainer>
   );
 };
