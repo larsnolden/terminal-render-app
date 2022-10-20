@@ -4,6 +4,8 @@ import styled from "styled-components";
 
 import Card from "../components/Card";
 import Pill from "../components/Pill";
+import Map from "../components/Map";
+import Direction from "../components/Direction";
 
 const HeightContainer = styled.div`
   height: ${(props) => props.height}px;
@@ -62,7 +64,7 @@ const Schedule = ({ personName, schedule }) => {
   return (
     <div className="min-h-screen">
       <div className="text-2xl">Hello {personName}</div>
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center">
         <Card className="w-1/3">
           <div className="flex flex-col">
             <div className="text-4xl">{dayjs().format("ddd D. MMM")}</div>
@@ -78,6 +80,12 @@ const Schedule = ({ personName, schedule }) => {
               ))}
             </div>
           </div>
+        </Card>
+        <Card className="mt-8 relative w-1/3 h-80">
+          <Map origin={854735} destination={854932} />
+        </Card>
+        <Card>
+          <Direction />
         </Card>
       </div>
     </div>
