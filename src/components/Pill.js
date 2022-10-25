@@ -7,8 +7,10 @@ const colors = {
   },
 };
 
-const Pill = ({ children, color }) => (
-  <div className={`${colors[color].background} rounded-lg p-2 h-auto h-min`}>
+const Pill = ({ children, color, className }) => (
+  <div
+    className={`${colors[color].background} rounded-lg p-2 h-auto h-min ${className}`}
+  >
     <div className={colors[color].text}>{children}</div>
   </div>
 );
