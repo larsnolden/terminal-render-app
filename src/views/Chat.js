@@ -16,7 +16,7 @@ import {
 
 dayjs.extend(relativeTime);
 
-const Recognize = ({ personName, messages, latestTranscript }) => {
+const Recognize = ({ messages, latestTranscript }) => {
   const [showTranscript, setShowTranscript] = useState(true);
   //   const messages = [
   //     {
@@ -39,47 +39,46 @@ const Recognize = ({ personName, messages, latestTranscript }) => {
   //   ];
 
   return (
-    <div className="w-full mb-4 min-h-screen">
-      <div className="flex flex-col items-center ">
-        <Element name="chat" className="element">
-          {messages.map((message) => {
-            return (
-              <Card
-                key={message.text}
-                className={`w-9/10 mt-4 rounded-full ${
-                  message.from === "user" ? "self-end" : "self-start"
-                }`}
-              >
-                <div className="flex flex-row items-center">
-                  <div className="text-2xl mr-2">
-                    {message.from === "bot" && "🤖"}
-                  </div>
-                  <div className="text-xl">{message.text}</div>
-                  {message.location && (
-                    <Pill color="blue" className="ml-2 font-semibold">
-                      {message.location}
-                    </Pill>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-          {latestTranscript && (
-            <Card className="w-9/10 mt-4 rounded-fullself-end opacity-90 self-end">
-              <div className="flex flex-row items-center">
-                <ReactLoading
-                  type={"bubbles"}
-                  color={"#44403C"}
-                  height={"20%"}
-                  width={"20%"}
-                />
-                <div className="text-xl ml-4">{latestTranscript}</div>
+    <Element
+      name="chat"
+      className="w-full mb-4 min-h-screen flex flex-col items-center element"
+    >
+      {messages.map((message) => {
+        return (
+          <Card
+            key={message.text}
+            className={`w-9/10 mt-4 rounded-full ${
+              message.from === "user" ? "self-end text-right" : "self-start"
+            }`}
+          >
+            <div className="flex flex-row items-center">
+              <div className="text-2xl mr-2">
+                {message.from === "bot" && "🤖"}
               </div>
-            </Card>
-          )}
-        </Element>
-      </div>
-    </div>
+              <div className="text-xl">{message.text}</div>
+              {message.location && (
+                <Pill color="blue" className="ml-2 font-semibold">
+                  {message.location}
+                </Pill>
+              )}
+            </div>
+          </Card>
+        );
+      })}
+      {latestTranscript && (
+        <Card className="w-9/10 mt-4 rounded-fullself-end opacity-90 self-end">
+          <div className="flex flex-row items-center">
+            <ReactLoading
+              type={"bubbles"}
+              color={"#44403C"}
+              height={"20%"}
+              width={"20%"}
+            />
+            <div className="text-xl ml-4">{latestTranscript}</div>
+          </div>
+        </Card>
+      )}
+    </Element>
   );
 };
 

@@ -2,10 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Map.css";
 import { MazeMapWrapper } from "./MazeMapWrapper";
 import { NavContext } from "../App";
+import Pill from "./Pill";
+import Card from "./Card";
 
 const pitchRotationLookingDirection = 40;
 
-function makeMazeMapInstance(setGeoJson) {
+function makeMazeMapInstance() {
   const mazemapRoot = document.createElement("div");
   mazemapRoot.className = "mazemap-root";
   const mapOptions = {
@@ -24,80 +26,22 @@ function makeMazeMapInstance(setGeoJson) {
   };
 
   // eslint-disable-next-line no-undef
-  const map = new Mazemap.Map(mapOptions);
-  // For debugging, it helps to add the map to global window
-  // to quickly access methods like window.mazemapinstance.getZoom(), etc.
-  // window.mazemapinstance = map;
-
-  // map.on("load", function () {
-  //   console.log("map loaded");
-  //   // eslint-disable-next-line no-undef
-  //   // const blueDot = new Mazemap.BlueDot({
-  //   //   map: map,
-  //   // })
-  //   //   .setLngLat({ lng: 6.8609919, lat: 52.2370638 })
-  //   //   .setZLevel(1)
-  //   //   .setAccuracy(10)
-  //   //   .show();
-
-  //   // eslint-disable-next-line no-undef
-  //   var routeController = new Mazemap.RouteController(map);
-
-  //   function setRoute(start, dest) {
-  //     console.log("set Route");
-
-  //     routeController.clear(); // Clear existing route, if any
-
-  //     // eslint-disable-next-line no-undef
-  //     Mazemap.Data.getRouteJSON(start, dest).then(function (geojson) {
-  //       setGeoJson(geojson);
-  //       console.log("ctx", NavContext);
-
-  //       routeController.setPath(geojson);
-  //       // eslint-disable-next-line no-undef
-  //       var bounds = Mazemap.Util.Turf.bbox(geojson);
-  //       map.fitBounds(bounds, { padding: 100 });
-  //     });
-  //   }
-
-  //   setRoute(
-  //     {
-  //       lngLat: {
-  //         lat: process.env.REACT_APP_TERMINAL_INSTALL_LAT,
-  //         lng: process.env.REACT_APP_TERMINAL_INSTALL_LON,
-  //       },
-  //       zLevel: 1, // required floor level indicator
-  //     },
-  //     { poiId: 854735 }
-  //   );
-  // });
-  console.log("lat", process.env.REACT_APP_TERMINAL_INSTALL_LAT);
-  return map;
+  return new Mazemap.Map(mapOptions);
 }
 
-// Make a "global" map instance to use throughout the app lifetime
-// and pass it around to components that need to interact with it
-
-function Map({ destinationPoid }) {
+function Map({ destination, poid }) {
   const { setGeoJson } = useContext(NavContext);
   const [map, setMap] = useState(null);
+  const [routeController, setRouteController] = useState(null);
 
   useEffect(() => {
-    setMap(makeMazeMapInstance(setGeoJson));
+    setMap(makeMazeMapInstance());
   }, []);
 
   useEffect(() => {
     if (map) {
       map.on("load", function () {
         console.log("map loaded");
-        // eslint-disable-next-line no-undef
-        // const blueDot = new Mazemap.BlueDot({
-        //   map: map,
-        // })
-        //   .setLngLat({ lng: 6.8609919, lat: 52.2370638 })
-        //   .setZLevel(1)
-        //   .setAccuracy(10)
-        //   .show();
 
         // eslint-disable-next-line no-undef
         var destinationMarkerOptions = new Mazemap.MazeMarker({
@@ -112,50 +56,60 @@ function Map({ destinationPoid }) {
           routeLineColorSecondary: "#4da86f",
         });
 
-        function setRoute(start, dest) {
-          console.log("set Route");
-
-          routeController.clear(); // Clear existing route, if any
-
-          // eslint-disable-next-line no-undef
-          Mazemap.Data.getRouteJSON(start, dest).then(function (geojson) {
-            setGeoJson(geojson);
-            console.log("ctx", NavContext);
-
-            routeController.setPath(geojson);
-            // eslint-disable-next-line no-undef
-            var bounds = Mazemap.Util.Turf.bbox(geojson);
-            map.fitBounds(bounds, { padding: 100 });
-
-            //set destination marker
-            const coordinates = geojson.features[0].geometry.coordinates;
-            const destLatLang = coordinates[coordinates.length - 1];
-
-            // eslint-disable-next-line no-undef
-            var marker = new Mazemap.MazeMarker(destinationMarkerOptions)
-              .setLngLat(destLatLang)
-              .addTo(map);
-          });
-        }
-
-        setRoute(
-          {
-            lngLat: {
-              lat: process.env.REACT_APP_TERMINAL_INSTALL_LAT,
-              lng: process.env.REACT_APP_TERMINAL_INSTALL_LON,
-            },
-            zLevel: 1, // required floor level indicator
-          },
-          { poiId: destinationPoid }
-        );
+        setRouteController(routeController);
       });
     }
-  }, [map]);
 
+    function setRoute(start, dest) {
+      routeController.clear(); // Clear existing route, if any
+
+      // eslint-disable-next-line no-undef
+      Mazemap.Data.getRouteJSON(start, dest).then(function (geojson) {
+        routeController.setPath(geojson);
+        setGeoJson(geojson);
+
+        // eslint-disable-next-line no-undef
+        var bounds = Mazemap.Util.Turf.bbox(geojson);
+        map.fitBounds(bounds, { padding: 100 });
+
+        //set destination marker
+        const coordinates = geojson.features[0].geometry.coordinates;
+        const destLatLang = coordinates[coordinates.length - 1];
+
+        // eslint-disable-next-line no-undef
+        var marker = new Mazemap.MazeMarker(destinationMarkerOptions)
+          .setLngLat(destLatLang)
+          .addTo(map);
+      });
+    }
+
+    if (routeController) {
+      setRoute(
+        {
+          lngLat: {
+            lat: process.env.REACT_APP_TERMINAL_INSTALL_LAT,
+            lng: process.env.REACT_APP_TERMINAL_INSTALL_LON,
+          },
+          zLevel: 1, // required floor level indicator
+        },
+        { poiId: destination.poid }
+      );
+    }
+  }, [map, destination, setGeoJson, poid]);
+
+  // console.log(destination);
   return (
-    <div className="Map">
-      {map && <MazeMapWrapper map={map}></MazeMapWrapper>}
-    </div>
+    <Card className="mt-8 mb-4 w-full">
+      <div className="flex flex-row mb-2">
+        <div className="text-3xl">Directions to</div>
+        <Pill color="blue" className="ml-4 font-semibold">
+          {destination.location}
+        </Pill>
+      </div>
+      <div className="relative h-80 mt-4 map">
+        {map && <MazeMapWrapper map={map} />}
+      </div>
+    </Card>
   );
 }
 
