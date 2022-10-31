@@ -42,12 +42,22 @@ dayjs.extend(relativeTime);
 //  setInterval does not use the latest of useState
 var lastShown = dayjs();
 
-const getNextEvent = (events) =>
-  events.reduce((acc, curr) => {
-    if (!acc) return curr;
-    if (dayjs(acc.from).isAfter(dayjs(curr.from))) return curr;
-    return acc;
-  }, null);
+const getNextEvent = (events) => {
+  const currentEvent = events.find((event) => {
+    if (dayjs(event.from).isBefore(dayjs()) && dayjs(event.to).isAfter(dayjs()))
+      return event;
+  });
+  if (currentEvent) return currentEvent;
+  try {
+    const nextEvent = events
+      .sort((a, b) => dayjs(a.from).isBefore(dayjs(b.from)))
+      .filter((event) => dayjs(event.from).isAfter(dayjs()))[0];
+    return nextEvent;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
 
 function App() {
   const [geoJson, setGeoJson] = useState(null);
@@ -63,6 +73,13 @@ function App() {
       callback: async (name) => {
         const { identifier } = await locatePerson(name); // make this async
         console.log("person found in poi", identifier);
+        if (!identifier) {
+          setMessages([
+            ...messages,
+            { text: `Where is ${name}`, from: "user" },
+            { text: `Sorry I could not find ${name}`, from: "bot" },
+          ]);
+        }
         setMessages([
           ...messages,
           { text: `Where is ${name}`, from: "user" },
@@ -94,11 +111,12 @@ function App() {
     //   },
     // },
     {
-      command: ["Yes", "yes"],
-      callback: () => {
+      command: ["Yes", "Fuck yeah"],
+      callback: async () => {
+        console.log("yes");
         // make this conditional on bot asking a question
         if (personOfInterestName) {
-          // meetWithPerson(personOfInterestName);
+          console.log("yes inside");
 
           setMessages([
             ...messages,
@@ -108,6 +126,15 @@ function App() {
               from: "bot",
             },
           ]);
+          await meetWithPerson(personOfInterestName, user.userName);
+          setTimeout(() => {
+            scroller.scrollTo("start", {
+              duration: 800,
+              delay: 0,
+              smooth: "easeInOutQuart",
+              offset: -300,
+            });
+          }, 1500);
         }
       },
     },
@@ -145,13 +172,16 @@ function App() {
     }
   }, [messages, resetTranscript]);
 
+  const nextEvent = user && user.schedule ? getNextEvent(user.schedule) : null;
+
   if (!browserSupportsSpeechRecognition) {
     return <div>Not supported</div>;
   }
 
   SpeechRecognition.startListening({ continuous: true });
 
-  const nextEvent = user && user.schedule ? getNextEvent(user.schedule) : null;
+  // const nextEvent = user && user.schedule[0];
+  console.log(user);
 
   return (
     <div className="bg-slate-50 min-h-screen text-stone-700 flex items-center justify-center">
@@ -186,8 +216,12 @@ function App() {
                   </Card>
                 </div>
                 <Schedule nextEvent={nextEvent} schedule={user.schedule} />
-                <Directions nextEvent={nextEvent} />
-                <Map destination={nextEvent} poid={nextEvent.poid} />
+                {nextEvent && nextEvent !== false && (
+                  <React.Fragment>
+                    <Directions nextEvent={nextEvent} />
+                    <Map destination={nextEvent} poid={nextEvent.poid} />
+                  </React.Fragment>
+                )}
                 <Chat messages={messages} latestTranscript={transcript} />
               </React.Fragment>
             )}

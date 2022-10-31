@@ -2,6 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import axios from "axios";
 import styled from "styled-components";
+import getPoi from "../getPoi";
 
 import { UserContext } from "../App";
 
@@ -26,25 +27,45 @@ const Container = styled.div`
 const WebcamCapture = () => {
   const webcamRef = useRef(null);
   const [connectionStatus, setConnectionStatus] = useState(false);
-  const { setUser } = useContext(UserContext);
+  const { setUser, user } = useContext(UserContext);
+  const [intervalId, setIntervalId] = useState(true);
 
   React.useEffect(() => {
-    setInterval(() => {
-      const imageSrc = webcamRef.current.getScreenshot();
-      var base64Data = imageSrc.replace(/^data:image\/jpeg;base64,/, "");
-      base64Data += base64Data.replace("+", " ");
-      axios
-        .post(`${process.env.REACT_APP_USER_SERVER_ENDOINT}/face_rec`, {
-          type: "image/jpeg",
-          image: base64Data,
-        })
-        .then((res) => {
-          if (res.data === "not found") setUser(null);
-          else setUser(res.data);
-          setConnectionStatus(true);
-        })
-        .catch(() => setConnectionStatus(false));
-    }, 2500);
+    if (intervalId) {
+      const intervalId = setInterval(() => {
+        const imageSrc = webcamRef.current.getScreenshot();
+        var base64Data = imageSrc.replace(/^data:image\/jpeg;base64,/, "");
+        base64Data += base64Data.replace("+", " ");
+        axios
+          .get(`${process.env.REACT_APP_USER_SERVER_ENDOINT}/alive`)
+          .then(() => {
+            axios
+              .post(`${process.env.REACT_APP_USER_SERVER_ENDOINT}/face_rec`, {
+                type: "image/jpeg",
+                image: base64Data,
+              })
+              .then(async (res) => {
+                if (res.data !== "bad image" && res.data !== "not found") {
+                  console.log(res.data);
+                  const scheduleWLocations = await Promise.all(
+                    res.data.schedule.map(async (event) => {
+                      const { identifier } = await getPoi(event.poid);
+                      console.log(identifier);
+                      return { ...event, location: identifier };
+                    })
+                  );
+                  console.log("banana", scheduleWLocations);
+
+                  setUser({ ...res.data, schedule: scheduleWLocations });
+                }
+                setConnectionStatus(true);
+              })
+              .catch(() => setConnectionStatus(false));
+          })
+          .catch(() => setConnectionStatus(false));
+      }, 2000);
+      setIntervalId(intervalId);
+    }
   }, []);
 
   return (
