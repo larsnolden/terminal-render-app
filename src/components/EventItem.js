@@ -12,7 +12,6 @@ const HeightContainer = styled.div`
 
 const TimeText = styled.div`
   bottom: ${(props) => props.bottomOffset}px;
-  right: 0;
 `;
 
 const Circle = styled.div`
