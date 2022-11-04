@@ -11,7 +11,7 @@ const ScheduleColumn = ({ time }) => (
 );
 //  hours the calendar is shown for
 //  make these full dayjs items (must include date) to check if event is at one of these instances
-const calendarHours = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((hour) =>
+const calendarHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map((hour) =>
   dayjs().hour(hour).minute(0).second(0)
 );
 

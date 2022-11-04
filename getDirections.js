@@ -1,8 +1,10 @@
 const axios = require("axios");
 
+// "https://routing.mazemap.com/routing/directions/?srid=4326&hc=false&sourcelat=52.2391519&sourcelon=6.857220489002543&targetlat=52.23835665087845&targetlon=6.857342399629715&sourcez=1&targetz=1&lang=en&distanceunitstype=metric&mode=PEDESTRIAN",
+
 async function main() {
   const res = await axios.get(
-    "https://routing.mazemap.com/routing/directions/?srid=4326&hc=false&sourcelat=52.23830178925549&sourcelon=6.857220489002543&targetlat=52.23835665087845&targetlon=6.857342399629715&sourcez=1&targetz=1&lang=en&distanceunitstype=metric&mode=PEDESTRIAN",
+    "https://routing.mazemap.com/routing/directions/?srid=4326&hc=false&sourcelat=52.2391519&sourcelon=6.857220489002543&desttype=poi&dest=820254&campusid=171&sourcez=1&targetz=1&lang=en&distanceunitstype=metric&mode=PEDESTRIAN",
     {
       credentials: "omit",
       headers: {

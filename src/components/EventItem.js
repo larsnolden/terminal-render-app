@@ -11,7 +11,8 @@ const HeightContainer = styled.div`
 `;
 
 const TimeText = styled.div`
-  bottom: ${(props) => props.bottomOffset}px;
+  bottom: ${(props) => props.bottomOffset - 4}px;
+  right: 0;
 `;
 
 const Circle = styled.div`
@@ -20,6 +21,7 @@ const Circle = styled.div`
   border-radius: 50%;
   bottom: ${(props) => props.bottomOffset}px;
   margin-left: 36px;
+  right: 50px;
 `;
 
 const EventItem = ({

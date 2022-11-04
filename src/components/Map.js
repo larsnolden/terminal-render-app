@@ -66,31 +66,26 @@ function Map({ destination, poid }) {
       // eslint-disable-next-line no-undef
       Mazemap.Data.getRouteJSON(start, dest).then(function (geojson) {
         routeController.setPath(geojson);
-        setGeoJson(geojson);
 
         // eslint-disable-next-line no-undef
         var bounds = Mazemap.Util.Turf.bbox(geojson);
         map.fitBounds(bounds, { padding: 100 });
 
-        //set destination marker
-        const coordinates = geojson.features[0].geometry.coordinates;
-        const destLatLang = coordinates[coordinates.length - 1];
+        setGeoJson(geojson);
+        // console.log("startLatLng", startLatLng, "endLatLng", endLatLng);
 
+        //set destination marker
         // eslint-disable-next-line no-undef
-        var marker = new Mazemap.MazeMarker(destinationMarkerOptions)
-          .setLngLat(destLatLang)
-          .addTo(map);
+        // var marker = new Mazemap.MazeMarker(destinationMarkerOptions)
+        //   .setLngLat(destLatLang)
+        //   .addTo(map);
       });
     }
 
     if (routeController) {
       setRoute(
         {
-          lngLat: {
-            lat: process.env.REACT_APP_TERMINAL_INSTALL_LAT,
-            lng: process.env.REACT_APP_TERMINAL_INSTALL_LON,
-          },
-          zLevel: 1, // required floor level indicator
+          poiId: process.env.REACT_APP_START_POID,
         },
         { poiId: destination.poid }
       );

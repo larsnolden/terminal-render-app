@@ -46,15 +46,12 @@ const WebcamCapture = () => {
               })
               .then(async (res) => {
                 if (res.data !== "bad image" && res.data !== "not found") {
-                  console.log(res.data);
                   const scheduleWLocations = await Promise.all(
                     res.data.schedule.map(async (event) => {
                       const { identifier } = await getPoi(event.poid);
-                      console.log(identifier);
                       return { ...event, location: identifier };
                     })
                   );
-                  console.log("banana", scheduleWLocations);
 
                   setUser({ ...res.data, schedule: scheduleWLocations });
                 }
